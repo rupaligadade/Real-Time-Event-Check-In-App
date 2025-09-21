@@ -3,7 +3,10 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
+import { useAuthStore, SERVER } from '@/src/hooks/usesocket';
+import { useRef, useEffect } from 'react';
 import { Platform } from 'react-native';
+import { io } from "socket.io-client";
 
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
@@ -51,3 +54,25 @@ export const Fonts = Platform.select({
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
 });
+export function useSocket(eventId?: string) {
+    const token = useAuthStore((s: { token: any; }) => s.token);
+    const socketRef = useRef<Socket | null>(null);
+
+    useEffect(() => {
+        if (!eventId) return;
+
+        const socket = io(SERVER, { auth: { token }, transports: ["websocket"] });
+        socketRef.current = socket;
+
+        socket.on("connect", () => {
+            socket.emit("subscribe", { eventId });
+        });
+
+        return () => {
+            socket.emit("unsubscribe", { eventId });
+            socket.disconnect();
+        };
+    }, [eventId, token]);
+
+    return socketRef.current;
+}
