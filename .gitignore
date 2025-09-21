@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
 # dependencies
@@ -41,3 +42,10 @@ app-example
 # generated native folders
 /ios
 /android
+=======
+node_modules
+# Keep environment variables out of version control
+.env
+
+/generated/prisma
+>>>>>>> 9b86b00 (files added)
